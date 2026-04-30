@@ -11,16 +11,16 @@ A web dashboard for exploring a historical Bitcoin price forecast. The app compa
 
 ## Current Evaluation Results
 
-These values come from `notebook55521b6263 (10).ipynb`.
+These values come from `C:\Users\User\Downloads\Model Evaluation.ipynb`.
 
 | Metric | Value |
 | --- | ---: |
 | Tested price points | 2,350 |
-| Average error | $35.41 |
-| Larger-error score | $50.46 |
-| MSE | $2,546.42 |
-| Mean bias | +$26.19 |
-| Average error share | 0.70% |
+| Average error | $23.77 |
+| Larger-error score | $40.03 |
+| MSE | $1,602.78 |
+| Mean bias | +$11.30 |
+| Average error share | 0.47% |
 | Actual price range | $3,140 - $6,657 |
 
 ## Tech Stack

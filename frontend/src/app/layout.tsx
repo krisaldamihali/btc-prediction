@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
-  title: "AI Bitcoin Forecast Engine | Futuristic Crypto Prediction",
-  description: "Predict future Bitcoin prices using advanced Machine Learning time series forecasting models. Powered by Flask and Next.js.",
+  title: "Bitcoin Price Forecast",
+  description: "Explore a historical Bitcoin price forecast with real accuracy results and simple visual insights.",
 };
 
 export default function RootLayout({
@@ -16,7 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={inter.className}>{children}</body>
+      <body>{children}</body>
     </html>
   );
 }

@@ -1,6 +1,7 @@
 import { Scene } from '@/components/Three/Scene';
 import { Hero } from '@/components/Sections/Hero';
 import { PredictionEngine } from '@/components/Sections/PredictionEngine';
+import { ModelPerformance } from '@/components/Sections/ModelPerformance';
 import { SystemInsights } from '@/components/Sections/SystemInsights';
 
 export default function Home() {
@@ -14,6 +15,7 @@ export default function Home() {
       <div className="relative z-10">
         <Hero />
         <PredictionEngine />
+        <ModelPerformance />
         <SystemInsights />
       </div>
     </main>

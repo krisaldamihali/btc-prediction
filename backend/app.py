@@ -1,95 +1,168 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import datetime
-import numpy as np
-import pandas as pd
-import joblib
+import json
 import os
+import csv
 
 app = Flask(__name__)
 CORS(app)
 
-MODEL_PATH = 'btc_model.joblib'
-STATE_PATH = 'last_state.joblib'
+PREDICTIONS_PATH = 'predictions.json'
+FEATURES_PATH = 'processed_btc_features.csv'
+MODEL_PATH = 'model.keras'
+SCALER_PATH = 'scaler.pkl'
 
-def load_ml_components():
-    if os.path.exists(MODEL_PATH) and os.path.exists(STATE_PATH):
-        model = joblib.load(MODEL_PATH)
-        state = joblib.load(STATE_PATH)
-        return model, state
-    return None, None
+NOTEBOOK_METRICS = {
+    "MAE": 23.77,
+    "RMSE": 40.03,
+    "MSE": 1602.78,
+    "MSE_scaled": 0.00000405,
+    "MAE_scaled": 0.00119477,
+    "bias": 11.30,
+    "mae_percent": 0.47,
+    "actual_min": 3140,
+    "actual_max": 6657,
+}
+
+def load_real_data():
+    if os.path.exists(PREDICTIONS_PATH):
+        with open(PREDICTIONS_PATH, 'r') as f:
+            return json.load(f)
+    return None
+
+def load_feature_summary():
+    summary = {
+        "features": ["Close", "volume_log", "hour_sin", "hour_cos", "dow_sin", "dow_cos"],
+        "rows": None,
+        "start": None,
+        "end": None,
+    }
+
+    if not os.path.exists(FEATURES_PATH):
+        return summary
+
+    row_count = 0
+    first_timestamp = None
+    last_timestamp = None
+
+    with open(FEATURES_PATH, newline='') as f:
+        reader = csv.DictReader(f)
+        summary["features"] = [name for name in (reader.fieldnames or []) if name]
+
+        for row in reader:
+            timestamp = row.get("")
+            if first_timestamp is None:
+                first_timestamp = timestamp
+            last_timestamp = timestamp
+            row_count += 1
+
+    summary.update({
+        "rows": row_count,
+        "start": first_timestamp,
+        "end": last_timestamp,
+    })
+    return summary
 
 @app.route('/health', methods=['GET'])
 def health():
-    return jsonify({"status": "active", "engine": "ML-PRO-V1"})
+    return jsonify({"status": "active", "engine": "Keras LSTM validation service"})
 
 @app.route('/model-info', methods=['GET'])
 def model_info():
-    return jsonify({
-        "name": "Quantum-RF Forecaster",
-        "type": "Random Forest Regressor",
-        "features": ["DayOfWeek", "DayOfMonth", "Month", "Lag1", "Lag7", "Rolling7"],
-        "metrics": {"MAE": 312.4, "RMSE": 480.2, "MAPE": "1.8%", "R2": 0.94},
-        "status": "LOADED" if os.path.exists(MODEL_PATH) else "MOCK_MODE"
-    })
+    data = load_real_data()
+    if data:
+        meta = data.get('metadata', {})
+        samples = data.get('data', [])
+        feature_summary = load_feature_summary()
+        return jsonify({
+            "name": "BTC Keras LSTM",
+            "version": "local-artifact",
+            "last_trained": samples[-1]["timestamp"] if samples else None,
+            "dataset": "processed_btc_features.csv",
+            "features": feature_summary["features"],
+            "metrics": {
+                "MAE": NOTEBOOK_METRICS["MAE"],
+                "RMSE": NOTEBOOK_METRICS["RMSE"],
+                "MSE": NOTEBOOK_METRICS["MSE"],
+                "MSE_scaled": NOTEBOOK_METRICS["MSE_scaled"],
+                "MAE_scaled": NOTEBOOK_METRICS["MAE_scaled"],
+                "bias": NOTEBOOK_METRICS["bias"],
+                "mae_percent": NOTEBOOK_METRICS["mae_percent"],
+                "actual_min": NOTEBOOK_METRICS["actual_min"],
+                "actual_max": NOTEBOOK_METRICS["actual_max"],
+            },
+            "architecture": meta.get('architecture'),
+            "window_size": meta.get('window_size'),
+            "horizon": meta.get('horizon'),
+            "n_samples": meta.get('n_samples'),
+            "prediction_range": {
+                "start": samples[0]["timestamp"] if samples else None,
+                "end": samples[-1]["timestamp"] if samples else None
+            },
+            "processed_data": feature_summary,
+            "artifacts": {
+                "model": MODEL_PATH,
+                "scaler": SCALER_PATH,
+                "predictions": PREDICTIONS_PATH
+            },
+            "status": "LOADED"
+        })
+    return jsonify({"status": "ERROR", "message": "Model data not found"})
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    data = request.json
-    horizon = int(data.get('horizon', 7))
+    req_data = request.json
+    # Return saved validation/test points from predictions.json.
+    horizon = int(req_data.get('horizon', 60))
     
-    model, state = load_ml_components()
-    
-    if not model:
-        # Fallback to smart mock if training hasn't finished
-        current_price = 65000
-        last_date = datetime.datetime.now()
-    else:
-        current_price = state['last_price']
-        last_date = datetime.datetime.fromisoformat(state['last_date'])
+    real_data = load_real_data()
+    if not real_data:
+        return jsonify({"error": "No model data available"}), 500
 
+    max_horizon = int(real_data.get('metadata', {}).get('horizon', 60))
+    horizon = max(1, min(horizon, max_horizon))
+
+    samples = real_data['data'][-horizon:]
+    
     dates = []
     predictions = []
     lower_bound = []
     upper_bound = []
     
-    temp_price = current_price
-    temp_date = last_date
-    
-    for i in range(horizon):
-        temp_date += datetime.timedelta(days=1)
+    for sample in samples:
+        dates.append(sample['timestamp'])
         
-        if model:
-            # Prepare features for prediction
-            features = pd.DataFrame([{
-                'day_of_week': temp_date.weekday(),
-                'day_of_month': temp_date.day,
-                'month': temp_date.month,
-                'lag_1': temp_price,
-                'lag_7': temp_price * 0.98, # Simplified lag estimation
-                'rolling_mean_7': temp_price * 1.01
-            }])
-            pred = model.predict(features)[0]
-        else:
-            # Enhanced mock
-            pred = temp_price * (1 + np.random.normal(0.002, 0.015))
-            
-        uncertainty = (i + 1) * 150
+        pred_val = sample['predicted']
+        predictions.append(round(float(pred_val), 2))
         
-        dates.append(temp_date.strftime("%Y-%m-%d"))
-        predictions.append(round(float(pred), 2))
-        lower_bound.append(round(float(pred - uncertainty), 2))
-        upper_bound.append(round(float(pred + uncertainty), 2))
-        
-        temp_price = pred
+        error = abs(sample['error'])
+        lower_bound.append(round(float(pred_val - error), 2))
+        upper_bound.append(round(float(pred_val + error), 2))
 
     return jsonify({
         "dates": dates,
         "predictions": predictions,
         "lower_bound": lower_bound,
         "upper_bound": upper_bound,
-        "trend": "BULLISH" if predictions[-1] > current_price else "BEARISH",
-        "metrics": {"MAE": 312.4, "R2": 0.94}
+        "actuals": [round(float(sample['actual']), 2) for sample in samples],
+        "errors": [round(float(sample['error']), 2) for sample in samples],
+        "trend": "UP" if predictions[-1] > predictions[0] else "DOWN",
+        "metrics": {
+            "MAE": NOTEBOOK_METRICS["MAE"],
+            "RMSE": NOTEBOOK_METRICS["RMSE"],
+            "MSE": NOTEBOOK_METRICS["MSE"],
+            "MSE_scaled": NOTEBOOK_METRICS["MSE_scaled"],
+            "MAE_scaled": NOTEBOOK_METRICS["MAE_scaled"],
+            "bias": NOTEBOOK_METRICS["bias"],
+            "mae_percent": NOTEBOOK_METRICS["mae_percent"],
+            "actual_min": NOTEBOOK_METRICS["actual_min"],
+            "actual_max": NOTEBOOK_METRICS["actual_max"],
+        },
+        "metadata": {
+            "horizon": horizon,
+            "generated_at": real_data['data'][-1]['timestamp'],
+            "source": PREDICTIONS_PATH
+        }
     })
 
 if __name__ == '__main__':

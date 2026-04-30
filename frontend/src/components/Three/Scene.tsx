@@ -5,7 +5,6 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Environment, ContactShadows } from '@react-three/drei';
 import { EffectComposer, Bloom, Noise, Vignette, ChromaticAberration } from '@react-three/postprocessing';
 import { BitcoinModel, AmbientGlows } from './BitcoinModel';
-import * as THREE from 'three';
 
 export function Scene() {
   return (

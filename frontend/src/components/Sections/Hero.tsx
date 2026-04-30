@@ -12,13 +12,13 @@ export function Hero() {
       <div className="absolute top-8 left-1/2 -translate-x-1/2 flex items-center gap-8 px-8 py-4 glass-panel thin-border z-50 whitespace-nowrap">
         <div className="flex items-center gap-3">
            <div className="w-2.5 h-2.5 rounded-full bg-brand shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
-           <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white">Quantum_Core</span>
+           <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white">BITCOIN FORECAST</span>
         </div>
         <div className="h-4 w-px bg-white/10" />
         <div className="flex gap-8 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
-           <span className="hover:text-white transition-colors cursor-pointer">Terminal</span>
-           <span className="hover:text-white transition-colors cursor-pointer">Protocol</span>
-           <span className="hover:text-white transition-colors cursor-pointer">Governance</span>
+           <span className="hover:text-white transition-colors cursor-pointer">Forecast</span>
+           <span className="hover:text-white transition-colors cursor-pointer">Accuracy</span>
+           <span className="hover:text-white transition-colors cursor-pointer">Insights</span>
         </div>
       </div>
 
@@ -35,16 +35,16 @@ export function Hero() {
           className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-xl mb-16 shadow-2xl mx-auto"
         >
            <Cpu size={14} className="text-brand animate-pulse" />
-           <span className="text-[10px] font-black tracking-[0.5em] uppercase text-white/60">System Initialized // v4.2.0</span>
+           <span className="text-[10px] font-black tracking-[0.5em] uppercase text-white/60">Historical Bitcoin price forecast</span>
         </motion.div>
         
         <h1 className="text-7xl md:text-[11rem] font-black tracking-[-0.05em] mb-12 leading-[0.85] text-white">
-          Beyond <br />
-          <span className="bg-gradient-to-r from-brand via-white to-gold bg-clip-text text-transparent italic px-4">Speculation</span>
+          Bitcoin <br />
+          <span className="bg-gradient-to-r from-brand via-white to-gold bg-clip-text text-transparent italic px-4">Prediction</span>
         </h1>
         
         <p className="text-xl md:text-3xl text-white/40 max-w-3xl mx-auto mb-20 font-light leading-relaxed tracking-tight px-4">
-          Where data meets destiny. Our neural architecture deciphers the hidden patterns of the blockchain in real-time.
+          Explore a tested Bitcoin price forecast and compare predicted prices against real market values from historical data.
         </p>
 
         <div className="flex flex-col md:flex-row items-center justify-center gap-12">
@@ -54,7 +54,7 @@ export function Hero() {
             onClick={() => document.getElementById('predictor')?.scrollIntoView({ behavior: 'smooth' })}
             className="px-14 py-7 bg-white text-black font-black rounded-[2rem] flex items-center gap-4 transition-all uppercase tracking-[0.2em] text-[11px] shadow-2xl"
           >
-            Access Terminal
+            View Forecast
             <ArrowRight size={20} strokeWidth={3} />
           </motion.button>
           
@@ -64,8 +64,8 @@ export function Hero() {
                    <ShieldCheck size={26} className="text-brand" />
                 </div>
                 <div>
-                   <p className="text-[10px] font-bold uppercase text-white/30 tracking-widest mb-1">Trust Index</p>
-                   <p className="text-xl font-black text-white italic">S-CLASS</p>
+                   <p className="text-[10px] font-bold uppercase text-white/30 tracking-widest mb-1">Average error</p>
+                   <p className="text-xl font-black text-white italic">$23.77</p>
                 </div>
              </div>
              <div className="h-12 w-px bg-white/10" />
@@ -74,8 +74,8 @@ export function Hero() {
                    <TrendingUp size={26} className="text-gold" />
                 </div>
                 <div>
-                   <p className="text-[10px] font-bold uppercase text-white/30 tracking-widest mb-1">Market Alpha</p>
-                   <p className="text-xl font-black text-white italic">+14.2%</p>
+                   <p className="text-[10px] font-bold uppercase text-white/30 tracking-widest mb-1">Tested points</p>
+                   <p className="text-xl font-black text-white italic">2,350</p>
                 </div>
              </div>
           </div>
