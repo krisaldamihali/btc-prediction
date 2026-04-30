@@ -1,42 +1,101 @@
-# AI Bitcoin Forecast Engine
+# Bitcoin Price Forecast
 
-A futuristic 3D web application for Bitcoin price prediction using Machine Learning.
+A web dashboard for exploring a historical Bitcoin price forecast. The app compares the model's predicted BTC price with the actual market price and presents the results in a clear, visual way.
 
-## Features
-- **3D Visualization**: Rotating Bitcoin coin and blockchain particles using Three.js and React Three Fiber.
-- **ML Backend**: Flask API serving time series forecasting predictions.
-- **Futuristic UI**: Dark fintech design with glassmorphism and neon accents.
-- **Dynamic Charts**: Interactive forecast charts with confidence intervals.
+## What the App Shows
+
+- Actual Bitcoin price and predicted Bitcoin price side by side.
+- Interactive chart comparing real and predicted prices.
+- Forecast accuracy summary based on the latest evaluation notebook.
+- Visual performance plots for forecast quality and error distribution.
+
+## Current Evaluation Results
+
+These values come from `notebook55521b6263 (10).ipynb`.
+
+| Metric | Value |
+| --- | ---: |
+| Tested price points | 2,350 |
+| Average error | $35.41 |
+| Larger-error score | $50.46 |
+| MSE | $2,546.42 |
+| Mean bias | +$26.19 |
+| Average error share | 0.70% |
+| Actual price range | $3,140 - $6,657 |
 
 ## Tech Stack
-- **Frontend**: Next.js 15, Tailwind CSS 4, Framer Motion, Three.js, Recharts.
-- **Backend**: Flask, NumPy, Pandas, Scikit-learn.
 
-## Getting Started
+- Frontend: Next.js 16, React 19, Tailwind CSS, Framer Motion, Three.js, Recharts.
+- Backend: Flask API serving saved model results and evaluation metadata.
+- Model artifacts: Keras LSTM output files, processed BTC features, scaler, plots, and saved prediction results.
 
-### 1. Start the Backend
+## Project Structure
+
+```text
+bitcoin-prediction/
+  backend/
+    app.py
+    model.keras
+    predictions.json
+    processed_btc_features.csv
+    scaler.pkl
+    requirements.txt
+  frontend/
+    src/
+    public/plots/
+    package.json
+```
+
+## Run Locally
+
+### Backend
+
 ```bash
 cd backend
-python -m venv venv
-# Windows
-.\venv\Scripts\activate
-# Mac/Linux
-source venv/bin/activate
-
 pip install -r requirements.txt
 python app.py
 ```
-The backend will run at `http://localhost:5000`.
 
-### 2. Start the Frontend
+Backend URL:
+
+```text
+http://127.0.0.1:5000
+```
+
+### Frontend
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-The frontend will run at `http://localhost:3000`.
 
-## Architecture
-- `POST /predict`: Generates future prices based on a selected horizon.
-- `GET /model-info`: Returns technical specifications of the forecasting model.
-- `GET /health`: System health monitoring.
+Frontend URL:
+
+```text
+http://localhost:3000
+```
+
+## API Endpoints
+
+- `GET /health` checks whether the backend is active.
+- `GET /model-info` returns model metadata and evaluation metrics.
+- `POST /predict` returns actual prices, predicted prices, errors, and summary metrics for the selected range.
+
+Example request:
+
+```bash
+curl -X POST http://127.0.0.1:5000/predict ^
+  -H "Content-Type: application/json" ^
+  -d "{\"horizon\":30}"
+```
+
+## Notes
+
+This project displays historical forecast evaluation results. It is not financial advice and should not be used as a trading recommendation.
+
+## Copyright
+
+Copyright (c) 2026. All rights reserved.
+
+This project, including its source code, interface design, model outputs, documentation, and visual assets, is protected by copyright. No part of this project may be copied, redistributed, modified, published, or used commercially without written permission from the author.
