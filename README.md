@@ -11,8 +11,6 @@ A web dashboard for exploring a historical Bitcoin price forecast. The app compa
 
 ## Current Evaluation Results
 
-These values come from `C:\Users\User\Downloads\Model Evaluation.ipynb`.
-
 | Metric | Value |
 | --- | ---: |
 | Tested price points | 2,350 |
@@ -96,6 +94,6 @@ This project displays historical forecast evaluation results. It is not financia
 
 ## Copyright
 
-Copyright (c) 2026. All rights reserved.
+Copyright © 2026 Krisalda Mihali. All rights reserved.
 
 This project, including its source code, interface design, model outputs, documentation, and visual assets, is protected by copyright. No part of this project may be copied, redistributed, modified, published, or used commercially without written permission from the author.
